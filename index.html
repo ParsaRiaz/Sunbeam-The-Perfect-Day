@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Day</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap');
+        :root { --ink:#28221f; --muted:#81756e; --paper:#f8f3ed; --panel:#fffdfa; --line:#e7ddd3; --accent:#a35d42; --accent-soft:#f1ddd1; --sage:#dfe4d5; --gold:#d9a649; --shadow:0 18px 50px rgba(76,53,39,.08); }
+        [data-theme="night"] { --ink:#f8efe6; --muted:#b5a49a; --paper:#171312; --panel:#241d1a; --line:#433832; --accent:#d79773; --accent-soft:#4b3029; --sage:#394137; --gold:#e4bb66; --shadow:0 18px 50px rgba(0,0,0,.22); }
+        [data-theme="rose"] { --ink:#26161a; --muted:#8b492a; --paper:#df8f9c; --panel:#fffdfc; --line:#eedde0; --accent:#642433; --accent-soft:#c97a8d; --sage:#53242f; --gold:#c9913c; --shadow:0 18px 50px rgba(122,66,76,.08); }
+        [data-theme="sage"] { --ink:#000101; --muted:#4c3b03; --paper:#66a191; --panel:#fcfdf9; --line:#dbe3d9; --accent:#095f55; --accent-soft:#dae6dc; --sage:#204905; --gold:#c29142; --shadow:0 18px 50px rgba(54,78,62,.08); }
+        * { box-sizing:border-box; }
+        body { margin:0; color:var(--ink); background:var(--paper); font-family:'DM Sans', sans-serif; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; transition:background .25s,color .25s; }
+        button, input, textarea { font:inherit; color:inherit; }
+        button { cursor:pointer; border:0; }
+        .app { display:grid; grid-template-columns:246px 1fr; min-height:100vh; }
+        aside { padding:31px 20px 24px; border-right:1px solid var(--line); display:flex; flex-direction:column; gap:38px; background:var(--paper); }
+        .brand { display:flex; align-items:center; gap:12px; padding:0 9px; }
+        .brand-mark { display:grid; place-items:center; width:34px; height:34px; color:#fff; background:var(--accent); border-radius:50%; font-family:Georgia,serif; font-size:20px; }
+        .brand-name { font-family:'Cormorant Garamond', 'Times New Roman', serif; font-size:21px; font-weight:600; letter-spacing:.02em; }
+        .eyebrow { color:var(--accent); text-transform:uppercase; font-size:10px; font-weight:700; letter-spacing:1.8px; }
+        nav { display:grid; gap:7px; }
+        .nav-item { display:flex; align-items:center; gap:13px; width:100%; padding:12px 13px; color:var(--muted); background:transparent; border-radius:9px; text-align:left; font-size:13px; font-weight:600; text-decoration:none; }
+        .nav-item:hover, .nav-item.active { color:var(--ink); background:var(--accent-soft); }
+        .nav-icon { width:18px; text-align:center; font-size:15px; }
+        .tracker-link, .card-link { display:block; text-decoration:none; color:inherit; }
+        .sidebar-foot { margin-top:auto; padding:16px 13px; border-top:1px solid var(--line); }
+        .theme-dots { display:flex; gap:9px; margin-top:12px; }
+        .theme-dot { width:18px; height:18px; border:2px solid transparent; border-radius:50%; outline:1px solid var(--line); }
+        .theme-dot.selected { outline:2px solid var(--accent); outline-offset:2px; }
+        main { max-width:1400px; width:100%; margin:auto; padding:31px 48px 60px; }
+        .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:43px; }
+        .date { color:var(--muted); font-size:12px; letter-spacing:.2px; }
+        .profile { display:flex; align-items:center; gap:11px; color:var(--muted); font-size:12px; }
+        .avatar { width:32px; height:32px; display:grid; place-items:center; color:#fff; background:#706050; border-radius:50%; font-weight:700; }
+        .hero { display:flex; justify-content:space-between; align-items:end; gap:30px; margin-bottom:35px; }
+        h1, h2, h3, p { margin:0; }
+        h1 { max-width:590px; font:600 clamp(34px,4.5vw,59px)/0.92 'Cormorant Garamond', 'Times New Roman', serif; letter-spacing:-.06em; text-wrap:balance; }
+        h1 em { color:var(--accent); font-style:normal; }
+        .hero-note { max-width:270px; color:var(--muted); font-size:13px; line-height:1.7; padding-bottom:3px; }
+        .grid { display:grid; grid-template-columns:1.28fr .9fr .9fr; gap:16px; align-items:start; }
+        .card { padding:22px; background:var(--panel); border:1px solid var(--line); border-radius:11px; box-shadow:var(--shadow); }
+        .board-card { grid-row:span 2; min-height:492px; }
+        .card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        h2 { font:600 21px/1.1 'Cormorant Garamond', 'Times New Roman', serif; letter-spacing:-.04em; }
+        h3 { font-size:13px; font-weight:700; }
+        .tiny { color:var(--muted); font-size:11px; }
+        .text-btn { padding:0; color:var(--accent); background:transparent; font-size:11px; font-weight:700; }
+        .board { display:grid; grid-template-columns:1.05fr .95fr; grid-template-rows:150px 150px; gap:9px; }
+        .pin { position:relative; overflow:hidden; min-height:100px; background:#ead9cb; border-radius:7px; }
+        .pin img { width:100%; height:100%; display:block; object-fit:cover; }
+        .pin:first-child { grid-row:span 2; }
+        .pin-label { position:absolute; left:9px; bottom:8px; padding:4px 7px; color:#fff; background:rgba(32,24,20,.58); border-radius:4px; font-size:10px; }
+        .board-add { display:flex; align-items:center; justify-content:center; gap:8px; min-height:62px; margin-top:14px; border:1px dashed var(--line); border-radius:7px; color:var(--muted); background:transparent; font-size:12px; }
+        .board-add:hover { border-color:var(--accent); color:var(--accent); }
+        .metric { display:flex; align-items:center; gap:15px; }
+        .mood-face { display:grid; place-items:center; width:54px; height:54px; border-radius:50%; background:var(--accent-soft); font-size:27px; }
+        .mood-score { font:600 28px/1 'Cormorant Garamond', 'Times New Roman', serif; letter-spacing:-.04em; }
+        .mood-scale { display:flex; gap:5px; margin-top:17px; }
+        .mood-scale button { width:100%; height:7px; background:var(--line); border-radius:4px; }
+        .mood-scale button.on { background:var(--accent); }
+        .quote { min-height:218px; display:flex; flex-direction:column; justify-content:space-between; background:var(--ink); color:var(--paper); border-color:var(--ink); }
+        .quote .eyebrow { color:var(--gold); }
+        blockquote { margin:24px 0 0; font:600 21px/1.2 'Cormorant Garamond', 'Times New Roman', serif; letter-spacing:-.02em; }
+        .quote cite { color:var(--muted); font-size:11px; font-style:normal; }
+        .track-row { display:flex; align-items:center; justify-content:space-between; margin:16px 0; }
+        .progress { height:6px; overflow:hidden; background:var(--line); border-radius:4px; }
+        .progress span { display:block; width:68%; height:100%; background:var(--accent); border-radius:4px; }
+        .period-dots { display:flex; gap:7px; margin-top:17px; }
+        .period-dots i { width:18px; height:18px; border-radius:50%; background:var(--accent-soft); }
+        .period-dots i.active { background:var(--accent); }
+        .todo-list { display:grid; gap:12px; }
+        .todo { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; }
+        .todo input { appearance:none; width:16px; height:16px; margin:0; border:1px solid var(--line); border-radius:4px; background:transparent; }
+        .todo input:checked { border-color:var(--accent); background:var(--accent); box-shadow:inset 0 0 0 3px var(--panel); }
+        .todo input:checked + span { text-decoration:line-through; opacity:.58; }
+        .add-task { display:flex; gap:7px; margin-top:17px; }
+        .add-task input, .link-input { width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:6px; outline:0; background:transparent; font-size:11px; }
+        .add-task input:focus, .link-input:focus { border-color:var(--accent); }
+        .icon-btn { display:grid; place-items:center; width:32px; min-width:32px; color:#fff; background:var(--accent); border-radius:6px; font-size:18px; }
+        .done-card { grid-column:span 2; }
+        .done-form { display:flex; gap:10px; }
+        .done-form textarea { flex:1; min-height:44px; resize:vertical; padding:11px; border:1px solid var(--line); border-radius:6px; background:transparent; outline:0; font-size:12px; }
+        .save-btn { padding:0 18px; color:#fff; background:var(--accent); border-radius:6px; font-size:11px; font-weight:700; }
+        .toast { position:fixed; right:25px; bottom:25px; padding:12px 16px; color:#fff; background:var(--ink); border-radius:6px; font-size:12px; opacity:0; transform:translateY(10px); transition:.25s; pointer-events:none; }
+        .toast.show { opacity:1; transform:translateY(0); }
+        @media (max-width:900px) { .app { grid-template-columns:1fr; } aside { padding:16px 18px; border-right:0; border-bottom:1px solid var(--line); gap:15px; } .brand { padding:0; } nav { display:flex; overflow:auto; gap:4px; } .nav-item { min-width:max-content; } .nav-item span:last-child { display:none; } .sidebar-foot { display:none; } main { padding:25px 20px 45px; } .topbar { margin-bottom:30px; } .grid { grid-template-columns:1fr 1fr; } .board-card { grid-row:auto; grid-column:span 2; } .done-card { grid-column:span 2; } }
+        @media (max-width:580px) { .hero { display:block; } .hero-note { margin-top:16px; } .grid { grid-template-columns:1fr; } .board-card, .done-card { grid-column:auto; } .board { grid-template-rows:125px 125px; } .done-form { display:grid; } .save-btn { min-height:40px; } }
+    </style>
+</head>
+<body data-theme="classic">
+    <div class="app">
+        <aside>
+            <div class="brand"><div class="brand-mark">p</div><div class="brand-name">The perfect day</div></div>
+            <nav aria-label="Main navigation">
+                <button class="nav-item active"><span class="nav-icon">🍀</span><span>My day</span></button>
+                <a class="nav-item" href="mood_board.html"><span class="nav-icon">📍</span><span>Mood board</span></a>
+                <a class="nav-item" href="Wellness_self-care.html"><span class="nav-icon">⛄</span><span>Wellness</span></a>
+                <a class="nav-item" href="period_tracking.html"><span class="nav-icon">🌙</span><span>Period tracker</span></a>
+                <button class="nav-item"><span class="nav-icon">📝</span><span>Quote</span></button>
+                <a class="nav-item" href="productivity_planner.html"><span class="nav-icon">🏹</span><span>Daily Plans</span></a>
+            </nav>
+            <div class="sidebar-foot"><div class="eyebrow">Color mood</div><div class="tiny" style="margin-top:5px">Choose your space</div><div class="theme-dots"><button class="theme-dot selected" data-set-theme="classic" style="background:#28221f" aria-label="Brown and black theme"></button><button class="theme-dot" data-set-theme="night" style="background:#171312" aria-label="Night theme"></button><button class="theme-dot" data-set-theme="rose" style="background:#ba6877" aria-label="Rose theme"></button><button class="theme-dot" data-set-theme="sage" style="background:#657c6e" aria-label="Sage theme"></button></div></div>
+        </aside>
+        <main>
+            <div class="topbar"><div class="date" id="today"></div><div class="profile"><span>your little corner</span><div class="avatar">Y</div></div></div>
+            <section class="hero"><div><div class="eyebrow" style="margin-bottom:13px">Saturday, August 29</div><h1>Make room for a day that feels <em>like you.</em></h1></div><p class="hero-note">A place to make every day feel perfect.</p></section>
+            <section class="grid">
+                <a class="tracker-link" href="mood_board.html"><article class="card board-card"><div class="card-head"><div><div class="eyebrow">Today in pictures</div><h2 style="margin-top:4px">My mood board</h2></div><button class="text-btn" id="clear-board" type="button">clear all</button></div><div class="board" id="board"><div class="pin"><img src="https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=700&q=80" alt="Warm, sunlit desk with flowers"><span class="pin-label">slow mornings</span></div><div class="pin"><img src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=500&q=80" alt="Cream interior with plants"><span class="pin-label">soft spaces</span></div><div class="pin"><img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=500&q=80" alt="Notebook and coffee"><span class="pin-label">fresh start</span></div></div><button class="board-add" id="add-pin" type="button"><span>＋</span> Add a Pinterest image</button><div id="link-box" style="display:none;margin-top:12px"><input class="link-input" id="pin-url" placeholder="Paste an image URL here" type="url"><button class="text-btn" id="save-pin" style="margin-top:9px" type="button">add to board</button></div></article></a>
+                <a class="card-link" href="Wellness_self-care.html"><article class="card"><div class="card-head"><div><div class="eyebrow">Check in</div><h2 style="margin-top:4px">How are you?</h2></div><span class="tiny" id="mood-word">good</span></div><div class="metric"><div class="mood-face" id="mood-face">☀</div><div><div class="mood-score" id="mood-score">4 / 5</div><div class="tiny">a soft, steady energy</div></div></div><div class="mood-scale" aria-label="Rate your mood"><button class="on" data-mood="1"></button><button class="on" data-mood="2"></button><button class="on" data-mood="3"></button><button class="on" data-mood="4"></button><button data-mood="5"></button></div></article></a>
+                <article class="card quote"><div><div class="eyebrow">A thought for today</div><blockquote>“Sunbeam is a fun event.”</blockquote></div><cite>— Parsa and Maria</cite></article>
+                <a class="tracker-link" href="period_tracking.html"><article class="card"><div class="card-head"><div><div class="eyebrow">Body check-in</div><h2 style="margin-top:4px">Period tracker</h2></div><span class="tiny">day 14</span></div><div class="track-row"><span class="tiny">Next period</span><strong style="font-size:13px">in 14 days</strong></div><div class="progress"><span style="width:50%"></span></div><div class="period-dots"><i class="active"></i><i class="active"></i><i class="active"></i><i class="active"></i><i></i><i></i><i></i></div></article></a>
+                <a class="card-link" href="productivity_planner.html"><article class="card"><div class="card-head"><div><div class="eyebrow">Small steps</div><h2 style="margin-top:4px">To-do list</h2></div><span class="tiny" id="task-count">2 of 4</span></div><div class="todo-list" id="todo-list"><label class="todo"><input type="checkbox" checked><span>Drink a big glass of water</span></label><label class="todo"><input type="checkbox" checked><span>Take a real lunch break</span></label><label class="todo"><input type="checkbox"><span>Move my body for 20 minutes</span></label><label class="todo"><input type="checkbox"><span>Put my phone away at 10</span></label></div><form class="add-task" id="task-form"><input id="task-input" placeholder="add a small thing..." aria-label="New task"><button class="icon-btn" aria-label="Add task">+</button></form></article></a>
+                <article class="card done-card"><div class="card-head"><div><div class="eyebrow">A little pride</div><h2 style="margin-top:4px">What I got done today</h2></div><span class="tiny">private note</span></div><form class="done-form" id="done-form"><textarea id="done-input" placeholder="Even the tiny wins count here..."></textarea><button class="save-btn">save note</button></form></article>
+            </section>
+        </main>
+    </div><div class="toast" id="toast">Saved to your perfect day</div>
+    <script>
+        const body = document.body;
+        const toast = document.getElementById('toast');
+        const showToast = (message) => { toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); };
+        document.getElementById('today').textContent = new Intl.DateTimeFormat('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' }).format(new Date());
+        document.querySelectorAll('[data-set-theme]').forEach((button) => button.addEventListener('click', () => { body.dataset.theme = button.dataset.setTheme; document.querySelectorAll('.theme-dot').forEach((dot) => dot.classList.toggle('selected', dot === button)); localStorage.setItem('perfect-day-theme', button.dataset.setTheme); }));
+        const storedTheme = localStorage.getItem('perfect-day-theme'); if (storedTheme) { body.dataset.theme = storedTheme; document.querySelectorAll('.theme-dot').forEach((dot) => dot.classList.toggle('selected', dot.dataset.setTheme === storedTheme)); }
+        document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach((nav) => nav.classList.remove('active')); item.classList.add('active'); showToast(item.textContent.trim() + ' selected'); }));
+        document.querySelectorAll('[data-mood]').forEach((button) => button.addEventListener('click', () => { const score = Number(button.dataset.mood); document.querySelectorAll('[data-mood]').forEach((mood) => mood.classList.toggle('on', Number(mood.dataset.mood) <= score)); document.getElementById('mood-score').textContent = score + ' / 5'; document.getElementById('mood-word').textContent = ['low','tender','okay','good','glowing'][score - 1]; document.getElementById('mood-face').textContent = ['☾','◒','○','☀','✦'][score - 1]; }));
+        document.getElementById('add-pin').addEventListener('click', () => { document.getElementById('link-box').style.display = 'block'; document.getElementById('pin-url').focus(); });
+        document.getElementById('save-pin').addEventListener('click', () => { const url = document.getElementById('pin-url').value.trim(); if (!url) return; const pin = document.createElement('div'); pin.className = 'pin'; pin.innerHTML = '<img src="' + url.replace(/"/g, '') + '" alt="Personal mood board image"><span class="pin-label">new feeling</span>'; document.getElementById('board').appendChild(pin); document.getElementById('pin-url').value = ''; document.getElementById('link-box').style.display = 'none'; showToast('Added to your board'); });
+        document.getElementById('clear-board').addEventListener('click', () => { document.getElementById('board').innerHTML = '<div class="tiny" style="grid-column:1/-1;padding:30px 0;text-align:center">Your board is ready for a new feeling.</div>'; showToast('Board cleared'); });
+        const updateCount = () => { const boxes = [...document.querySelectorAll('#todo-list input')]; document.getElementById('task-count').textContent = boxes.filter((box) => box.checked).length + ' of ' + boxes.length; }; document.getElementById('todo-list').addEventListener('change', updateCount);
+        document.getElementById('task-form').addEventListener('submit', (event) => { event.preventDefault(); const input = document.getElementById('task-input'); if (!input.value.trim()) return; const label = document.createElement('label'); label.className = 'todo'; label.innerHTML = '<input type="checkbox"><span>' + input.value.trim().replace(/[<>]/g, '') + '</span>'; document.getElementById('todo-list').appendChild(label); input.value = ''; updateCount(); showToast('A new step was added'); });
+        document.getElementById('done-form').addEventListener('submit', (event) => { event.preventDefault(); if (document.getElementById('done-input').value.trim()) showToast('Your win was saved'); });
+    </script>
+</body>
+</html>
